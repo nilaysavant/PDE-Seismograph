@@ -112,7 +112,7 @@ void setup()
   X[0] = x_ref;
   
   
-  amp_time[0] = 0; // Starting Amplitude = 0
+  amp_time[0] = 0; // Starting Amplitude = 0 
   
   max_cons_amp_time = 1500; // max amp time to be considered
   
