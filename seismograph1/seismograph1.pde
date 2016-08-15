@@ -33,6 +33,20 @@ int max_cons_amp_time = 1500; // max amp time to be considered
 
 int wave_dist = x_interval_dist * 2; //Distance between two wave beats
 
+//DATE-TIME register variables
+int sec[] = new int[1];  // Values from 0 - 59
+int min[] = new int[1];  // Values from 0 - 59
+int hour[] = new int[1];    // Values from 0 - 23
+  
+int day[] = new int[1];    // Values from 1 - 31
+int month[] = new int[1];  // Values from 1 - 12
+int year[] = new int[1];   // 2003, 2004, 2005, etc.
+int ival[] = new int[1]; // For storing i val at beat
+
+//DATA TABLE- for storing the amplitude data
+Table table;
+
+
 // screen 0, 1, or 2
 int screen = 1;
 
@@ -130,6 +144,15 @@ void setup()
   
   //Vertice iterator
   vert_num = 1;
+  
+  //Data Table
+  table = new Table();
+
+  table.addColumn("S.No");
+  table.addColumn("X");
+  table.addColumn("Y");
+  table.addColumn("Amplitude");
+  table.addColumn("Time Stamp");
 
   osc_button = false; // button for wave simulation
 }
@@ -172,12 +195,27 @@ void draw()
       init_time = millis();
       if((init_time - wave_stop_time) > wave_delay)
       {
+        
         Y = append(Y, y_ref);
         X = append(X, x_ref);
         amp_time = append(amp_time, 0);
         Y = append(Y, y_ref);
         X = append(X, x_ref+wave_dist/2);
         amp_time = append(amp_time, 0);
+        
+        
+        //Register date time for this wave beat
+        sec = append(sec, second());  // Values from 0 - 59
+        min = append(min, minute());
+        hour = append(hour, hour());
+        
+        day = append(day, day());
+        month = append(month, month());
+        year = append(year, year());
+        
+        ival = append(ival, X.length - 1);
+        
+
         for(int a=X.length-1;a>0;a--)
         {
           X[a] = X[a] - wave_dist;
@@ -217,6 +255,7 @@ void draw()
   }
   for (int i = 0; i < X.length; i++)
   {
+    
     if(i%2 == 0)
     {
  
@@ -231,17 +270,58 @@ void draw()
     }
     if(i>0)
     { 
-      if( (Y[i-1] == y_ref) && (Y[i] == y_ref))
+      for(int a = 0; a<ival.length; a++)
       {
-        line(X[i], height/8 , X[i], height);
+        if(i == ival[a])//( (Y[i-1] == y_ref) && (Y[i] == y_ref))
+        {
+          line(X[i], height/8 , X[i], height);
+          Time(hour[a], min[a], sec[a], day[a], month[a], year[a], X[i], height/8 +10, a);
+          
+        }
       }
     }
+    
    
   } 
   
 }
+void exit()
+{
+  for (int i = 0; i < X.length; i++)
+  {
+    TableRow newRow = table.addRow();
+    newRow.setInt("S.No", table.getRowCount() - 1);
+    newRow.setInt("X", X[i]);
+    newRow.setInt("Y", Y[i]);
+    newRow.setInt("Amplitude", amp_time[i]);
+    
+    if(i>0)
+    { 
+      for(int a = 0; a<ival.length; a++)
+      {
+        if(i == ival[a])//( (Y[i-1] == y_ref) && (Y[i] == y_ref))
+        {
+          newRow.setString("Time Stamp",hour[a]+":"+min[a]+":"+sec[a]+" "+day[a]+"/"+month[a]+"/"+year[a]);
+          
+        }
+      }
+    }
+    
+  }
+  saveTable(table, "data/"+hour()+"H"+minute()+"M"+second()+"S"+" "+day()+"D"+month()+"M"+year()+"Y"+".csv");
+  println("Closing sketch");
+}
 
-
+void Time(int hour, int min, int sec, int day, int month, int year, int x, int y, int i)
+{
+  
+  
+  text(i, x, y);
+  text(hour+":"+min+":"+sec, x, y+10);
+  text(day+"/"+month+"/"+year, x, y+20);
+  
+  
+}
 
 
 
