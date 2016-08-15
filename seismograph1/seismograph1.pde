@@ -8,8 +8,8 @@
  */
 
 //Vertices of shock waves
-int X[] = new int[200];
-int Y[] = new int[200];
+int X[] = new int[1];
+int Y[] = new int[1];
 int vert_num = 1;
 int x_interval_dist = 10; //in pixels
 
@@ -26,7 +26,7 @@ boolean osc_toggle = false;
 
 //time variables
 int init_time = 0;
-int amp_time = 0;
+int amp_time[] = new int[1];
 
 
 // screen 0, 1, or 2
@@ -105,12 +105,14 @@ void setup()
   //Start point 
   Y[0] = y_ref;
   X[0] = x_ref;
+  amp_time[0] = 0;
   x_interval_dist = 10;
   //start_button = new Button("START" , width/2, height/2, width/2, height/4);
 
   // Size of the window
-
-
+  
+  //Vertice iterator
+  vert_num = 1;
 
   osc_button = false;
 }
@@ -155,11 +157,12 @@ void draw()
     if (osc_toggle == true)
     {
       println("osc_button = false");
-      amp_time = millis() - init_time; 
+      amp_time = append(amp_time, millis() - init_time); 
 
-      Y[vert_num] =  y_ref -int(amp_time * amp_mag_fac);
-      X[vert_num] =  x_ref;
-      println(Y[vert_num+1]);
+      Y = append(Y, y_ref -int(amp_time[vert_num] * amp_mag_fac));
+      X = append(X, x_ref);
+      println(Y);
+      
       vert_num += 1;
       for(int a=X.length-1;a>0;a--)
       {
@@ -192,8 +195,8 @@ void draw()
     }
 
    
-  }
-  //delay(100);
+  } 
+  
 }
 
 
