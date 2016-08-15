@@ -25,9 +25,13 @@ boolean osc_button = false;
 boolean osc_toggle = false;
 
 //time variables
-int init_time = 0;
+int init_time = 0; // initial time to check for amplitude
 int amp_time[] = new int[1];
+int wave_delay = 4000; // max time after last earthquake to be considered a wave of earthquake
+int wave_stop_time = 0; // time to be noted when a wave stops
+int max_cons_amp_time = 1500; // max amp time to be considered
 
+int wave_dist = x_interval_dist * 2; //Distance between two wave beats
 
 // screen 0, 1, or 2
 int screen = 1;
@@ -99,21 +103,35 @@ void setup()
 {
   size(800, 800); 
 
-  x_ref = width/2;
+  //Reference from where drawing starts on screen
+  x_ref = width-width/6;
   y_ref = height/2;
 
   //Start point 
   Y[0] = y_ref;
   X[0] = x_ref;
-  amp_time[0] = 0;
-  x_interval_dist = 10;
+  
+  
+  amp_time[0] = 0; // Starting Amplitude = 0
+  
+  max_cons_amp_time = 1500; // max amp time to be considered
+  
+  x_interval_dist = (4 * width)/800;  //Horizontal dist between waves
+  
+  wave_dist = x_interval_dist * 4; //Distance between two wave beats
+  
   //start_button = new Button("START" , width/2, height/2, width/2, height/4);
-
+  
+  //amplitude magnification factor 
+  amp_mag_fac = (0.2 * height)/800;
+  
+  wave_delay = 4000; // max time after last earthquake to be considered a wave of earthquake
+  wave_stop_time = 0; // time to be noted when a wave stops
   
   //Vertice iterator
   vert_num = 1;
 
-  osc_button = false;
+  osc_button = false; // button for wave simulation
 }
 
 
@@ -141,40 +159,59 @@ void draw()
   background(255);
   fill(0);
   smooth();
+  
+  line(0, height/8, width, height/8); // line dividing menubar from wave monitor
+  
   if (osc_button)
   {
 
     if (osc_toggle == false)
     {
       println("osc_button = true");
+      
       init_time = millis();
+      if((init_time - wave_stop_time) > wave_delay)
+      {
+        Y = append(Y, y_ref);
+        X = append(X, x_ref);
+        amp_time = append(amp_time, 0);
+        Y = append(Y, y_ref);
+        X = append(X, x_ref+wave_dist/2);
+        amp_time = append(amp_time, 0);
+        for(int a=X.length-1;a>0;a--)
+        {
+          X[a] = X[a] - wave_dist;
+        }
+        
+      }
+      
       osc_toggle = true;
     }
-  } else if (osc_button == false)
+  } 
+  else if (osc_button == false)
   {
 
     if (osc_toggle == true)
     {
       println("osc_button = false");
-      amp_time = append(amp_time, millis() - init_time); 
-
-      Y = append(Y, y_ref -int(amp_time[vert_num] * amp_mag_fac));
-      X = append(X, x_ref);
-      println(Y);
-      
-      vert_num += 1;
-      for(int a=X.length-1;a>0;a--)
+      int temp_time = millis() - init_time;
+      if(temp_time < max_cons_amp_time)
       {
-        X[a-1] = X[a] - x_interval_dist;
+        amp_time = append(amp_time, temp_time); 
+        wave_stop_time = millis();
+      
+        Y = append(Y, y_ref -int(amp_time[amp_time.length-1] * amp_mag_fac));
+        X = append(X, x_ref);
+        println(Y);
+      
+        vert_num += 1;
+        for(int a=X.length-1;a>0;a--)
+        {
+          X[a] = X[a] - x_interval_dist;
+        
+        }
         
       }
-      
-      
-      
-      
-      //println(X[vert_num]+ " " +vert_num);
-      
-
       osc_toggle = false;
     }
   }
@@ -183,16 +220,22 @@ void draw()
     if(i%2 == 0)
     {
  
-      line(X[i]-5, y_ref, X[i], abs(Y[i]));
-      line(X[i],abs(Y[i]), X[i]+5, y_ref);
+      line(X[i]-(x_interval_dist/2), y_ref, X[i], abs(Y[i]));
+      line(X[i],abs(Y[i]), X[i]+(x_interval_dist/2), y_ref);
     }
     else
     {
-      line(X[i]-5, y_ref, X[i], width - abs(Y[i]));
-      line(X[i],width - abs(Y[i]), X[i]+5, y_ref);
+      line(X[i]-(x_interval_dist/2), y_ref, X[i], height - abs(Y[i]));
+      line(X[i],height - abs(Y[i]), X[i]+(x_interval_dist/2), y_ref);
       
     }
-
+    if(i>0)
+    { 
+      if( (Y[i-1] == y_ref) && (Y[i] == y_ref))
+      {
+        line(X[i], height/8 , X[i], height);
+      }
+    }
    
   } 
   
