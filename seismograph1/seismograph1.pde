@@ -109,7 +109,6 @@ void setup()
   x_interval_dist = 10;
   //start_button = new Button("START" , width/2, height/2, width/2, height/4);
 
-  // Size of the window
   
   //Vertice iterator
   vert_num = 1;
