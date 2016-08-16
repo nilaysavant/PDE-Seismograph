@@ -68,7 +68,7 @@ void setup()
   //CONFIG FILE LOAD
   String port = null;
   float amp_mag = 0.3;
-  String config[] = loadStrings("config.txt");
+  String config[] = loadStrings("data/config/config.txt");
   port = config[0]; //assign port from  config file
   amp_mag = float(config[1]); //initialise amp_mag from config file
 
