@@ -12,6 +12,7 @@ import processing.serial.*;
 Serial myPort;  // Create object from Serial class
 String val;      // Data received from the serial port
 
+//CONFIG FILE
 
 boolean t = false; //temp var
 
@@ -63,6 +64,13 @@ float sw = width*height/pow(10, 4) + 0.1;
 void setup() 
 {
   size(1200, 800); //800,800 default
+  
+  //CONFIG FILE LOAD
+  String port = null;
+  float amp_mag = 0.3;
+  String config[] = loadStrings("config.txt");
+  port = config[0]; //assign port from  config file
+  amp_mag = float(config[1]); //initialise amp_mag from config file
 
   //Reference from where drawing starts on screen
   x_ref = width-width/6;
@@ -82,8 +90,10 @@ void setup()
   wave_dist = x_interval_dist * 4; //Distance between two wave beats
 
   //amplitude magnification factor 
-  amp_mag_fac = (0.3 * height)/800; //defalut (0*2 * height)800
-
+  println("AMP :::"+amp_mag);
+  amp_mag_fac = (amp_mag * height)/800; //defalut (0*2 * height)800
+  
+  
   wave_delay = 4000; // max time after last earthquake to be considered a wave of earthquake
   wave_stop_time = 0; // time to be noted when a wave stops
 
@@ -100,12 +110,17 @@ void setup()
   table.addColumn("Time Stamp");
 
   osc_button = false; // button for wave simulation
-
+  
+  //Serial Ports File
+  //serial_all_ports = createWriter("serial_all_ports.txt");
+  
   //SERIAL
-  String portName = Serial.list()[0];
+  //String portName = Serial.list()[0];
+  saveStrings("serial_all_ports.txt", Serial.list());
   printArray(Serial.list());
-  myPort = new Serial(this, "/dev/ttyUSB0", 115200);
-  println(portName);
+  myPort = new Serial(this, port, 115200); // REQUIRED 
+  println("connected to serial: " + port);
+  
 }
 
 /*
@@ -145,7 +160,12 @@ void draw()
   fill(0);
   smooth();
   strokeWeight(sw);
-
+  
+  textSize(height/12);
+  textAlign(CENTER);
+  text("DIGITAL SEISMOGRAPH", width/2, height/10);
+  textSize(height/80);
+  textAlign(RIGHT);
   line(0, height/8, width, height/8); // line dividing menubar from wave monitor
 
   if (osc_button) // off mean
@@ -165,13 +185,11 @@ void draw()
       if (temp_time < max_cons_amp_time)
       {
         amp_time = append(amp_time, temp_time); 
-
-
-        Y = append(Y, y_ref -int(amp_time[amp_time.length-1] * amp_mag_fac));
+        Y = append(Y, y_ref -int((amp_time[amp_time.length-1]) * amp_mag_fac));  // PREVIOUSLY---> Y = append(Y, y_ref -int((amp_time[amp_time.length-1]) * amp_mag_fac));
         X = append(X, x_ref);
-        //println(Y);
-
+        
         vert_num += 1;
+        
         for (int a=X.length-1; a>0; a--)
         {
           X[a] = X[a] - x_interval_dist;
@@ -183,7 +201,7 @@ void draw()
       int temp = millis();
       if ((temp - wave_stop_time) > wave_delay && t == true)
       {
-        println("wave stop = true");
+        println("wave end");
         wave_stop_time = millis();
 
         Y = append(Y, y_ref);
@@ -279,7 +297,6 @@ void exit()
 
 void Time(int hour, int min, int sec, int day, int month, int year, int x, int y, int i)
 {
-  println("ENTERED");
   text(i, x, y);
   text(hour+":"+min+":"+sec, x, y+10);
   text(day+"/"+month+"/"+year, x, y+20);
