@@ -1,0 +1,10 @@
+Accelerometer:
+SDA -> A4
+SCL -> A5
+VCC -> 5V
+GND -> GND
+
+Proximity:
+SiG -> D3
+VCC -> D2
+GND -> GND

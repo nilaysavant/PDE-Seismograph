@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Seismograph(accelerometer) config file
+Author: Nilay Savant
+-->
+<config>
+	<seismograph_config>
+ 		<port>/dev/ttyUSB0</port> <!-- USB Serial port -->
+ 		<serial_baud_rate>9600</serial_baud_rate> <!-- baud rate or serial data transmission (def 9600) -->
+ 		<proximity>false</proximity> <!--If proximity sensor is present or not (def false) -->
+ 		<avg_times>10</avg_times> <!-- no of times times to take avg of initial sensor values (def 10) -->
+ 		<max_cons_amp>12500</max_cons_amp> <!-- max amp time to be considered (def 12500) -->
+ 		<min_cons_amp>1000</min_cons_amp> <!-- min amplitude to consider (def 1000) -->
+ 		<amp_mag_factor>1.95</amp_mag_factor> <!-- Amplitude magnification factor (def 0.35)-->
+ 		<wave_delay>4000</wave_delay> <!--(in ms) max time after last earthquake to be considered a wave of earthquake (def 4000) -->
+ 		<screenshot_switch>true</screenshot_switch> <!--(def true)screnshot switch(true to give screenshots,false no screenshots) -->
+ 		<create_end_data_table>false</create_end_data_table> <!-- switch for exporting separte table in the end of app(def false) -->
+ 		<x_ref>0</x_ref> <!-- (def 0) Reference from where drawing starts on screen -->
+ 		<x_interval_dist>0</x_interval_dist> <!-- Horizontal dist between waves (def 0 )-->
+	</seismograph_config>
+</config>
+
