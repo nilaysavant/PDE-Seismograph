@@ -2,7 +2,7 @@
  * WITH ACCEL SENSOR
  * Author: Nilay Savant
  *
- * Description : dsd projekt
+ * Description : dsd project
  * 
  * 
  */
